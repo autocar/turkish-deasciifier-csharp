@@ -85,14 +85,14 @@ namespace TurkishDeasciifier
             }
 
             this.originalString = asciiString;
-            buffer = asciiString.ToCharArray(startIndex, length);
+            this.buffer = asciiString.ToCharArray(startIndex, length);
             for (var i = startIndex; i < length; i++)
             {
                 char ch = buffer[i], x;
                 if (NeedCorrection(ch, i) && DeasciifierPatterns.TurkishToggleAccentsTable.TryGetValue(ch, out x))
                 {
                     // Adds or removes turkish accent at the cursor.
-                    SetCharAt(ref buffer, i, x);
+                    SetCharAt(this.buffer, i, x);
                 }
             }
             
@@ -166,7 +166,7 @@ namespace TurkishDeasciifier
         private void LoadExclusions()
         {
             string[] list = LoadList("exceptions.txt");
-            exclusions = new WordSet<string>(list);
+            this.exclusions = new WordSet<string>(list);
         }
 
         private string ApplyCorrections(string output)
@@ -192,17 +192,17 @@ namespace TurkishDeasciifier
         private void LoadCorrections()
         {
             string[] list = LoadList("corrections.txt");
-            corrections = new Dictionary<string, string>(list.Length);
+            this.corrections = new Dictionary<string, string>(list.Length);
             foreach (string line in list)
             {
                 string[] w2w = line.Split(',');
                 w2w[0] = w2w[0].Trim().ToLower();
                 w2w[1] = w2w[1].Trim().ToLower();
-                corrections.Add(w2w[0], w2w[1]);
+                this.corrections.Add(w2w[0], w2w[1]);
             }
         }
 
-        private static void SetCharAt(ref char[] buf, int index, char ch)
+        private static void SetCharAt(char[] buf, int index, char ch)
         {
             buf[index] = ch;
         }
@@ -259,14 +259,14 @@ namespace TurkishDeasciifier
         private char[] GetContext(int size, int point)
         {
             char[] s = new string(' ', 1 + (2 * size)).ToCharArray();
-            SetCharAt(ref s, size, 'X');
+            SetCharAt(s, size, 'X');
             int i = size + 1;
             int index = point + 1;
             bool space = false;
 
-            while (i < s.Length && !space && index < buffer.Length)
+            while (i < s.Length && !space && index < this.buffer.Length)
             {
-                char cc = buffer[index];
+                char cc = this.buffer[index];
                 char x;
                 if (!DeasciifierPatterns.TurkishDowncaseAsciifyTable.TryGetValue(cc, out x))
                 {
@@ -278,7 +278,7 @@ namespace TurkishDeasciifier
                 }
                 else
                 {
-                    SetCharAt(ref s, i, x);
+                    SetCharAt(s, i, x);
                     i++;
                     space = false;
                 }
@@ -294,7 +294,7 @@ namespace TurkishDeasciifier
 
             while (i >= 0 && index >= 0)
             {
-                char cc = buffer[index];
+                char cc = this.buffer[index];
                 char x;
                 if (!DeasciifierPatterns.TurkishUpcaseAccentsTable.TryGetValue(cc, out x))
                 {
@@ -306,7 +306,7 @@ namespace TurkishDeasciifier
                 }
                 else
                 {
-                    SetCharAt(ref s, i, x);
+                    SetCharAt(s, i, x);
                     i--;
                     space = false;
                 }
