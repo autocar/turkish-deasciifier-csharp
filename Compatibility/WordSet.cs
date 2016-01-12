@@ -2,6 +2,10 @@
 
 namespace TurkishDeasciifier.Compatibility
 {
+    /// <summary>
+    /// .NET 2.0 doesn't have Sets so we have to implement similar behaviour.
+    /// </summary>
+    /// <typeparam name="T">Any Hashable Type</typeparam>
     internal class WordSet<T> :  ICollection<T>
     {
         private readonly Dictionary<T, object> d;

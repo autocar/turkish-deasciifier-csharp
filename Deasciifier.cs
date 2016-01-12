@@ -37,18 +37,47 @@ namespace TurkishDeasciifier
         /// <summary>
         /// Asciifies the input
         /// </summary>
-        /// <param name="turkishString">turkish input string with non-ascii letters</param>
+        /// <param name="str">input string with non-ascii letters</param>
         /// <returns>asciified string</returns>
-        public static string Asciify(string turkishString)
+        public static string Asciify(string str)
         {
             StringBuilder asciified = new StringBuilder();
-            string normalized = turkishString.Normalize(NormalizationForm.FormD);
+            string normalized = str.Normalize(NormalizationForm.FormD);
             foreach (char ch in normalized)
             {
-                if (ch == '\u0131')
-                    asciified.Append('i');
-                else if (CharUnicodeInfo.GetUnicodeCategory(ch) != UnicodeCategory.NonSpacingMark)
-                    asciified.Append(ch);
+                switch (ch)
+                {
+                    case 'ı':
+                        asciified.Append('i');
+                        break;
+                    case 'æ':
+                        asciified.Append("ae");
+                        break;
+                    case 'ø':
+                    case 'ð':
+                        asciified.Append('o');
+                        break;
+                    case (char)778:
+                        asciified.Append(asciified[asciified.Length-1]);
+                        break;
+                    case 'ł':
+                        asciified.Append('l');
+                        break;
+                    case 'đ':
+                        asciified.Append('d');
+                        break;
+                    case 'ß':
+                        asciified.Append("ss");
+                        break;
+                    case 'Þ':
+                        asciified.Append("th");
+                        break;
+                    default:
+                        if (CharUnicodeInfo.GetUnicodeCategory(ch) != UnicodeCategory.NonSpacingMark)
+                            if (ch < 128)
+                                asciified.Append(ch);
+                        break;
+                }
             }
             return asciified.ToString();
         }
