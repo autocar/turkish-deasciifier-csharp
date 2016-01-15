@@ -34,6 +34,11 @@ namespace TurkishDeasciifier
         #endregion
 
         #region Public Methods
+        static readonly Dictionary<char, string> UnicodeAsciiMap = new Dictionary<char, string>
+        {
+            {'ı', "i"}, {'æ', "æ"}, {'ø', "o"}, {'ð', "o"}, {'ł', "l"}, {'đ', "d"}, {'ß', "ss"}, {'þ', "th"}
+        };
+
         /// <summary>
         /// Asciifies the input
         /// </summary>
@@ -43,40 +48,35 @@ namespace TurkishDeasciifier
         {
             StringBuilder asciified = new StringBuilder();
             string normalized = str.Normalize(NormalizationForm.FormD);
+            string append;
+
             foreach (char ch in normalized)
             {
-                switch (ch)
+                if (ch < 128)
                 {
-                    case 'ı':
-                        asciified.Append('i');
-                        break;
-                    case 'æ':
-                        asciified.Append("ae");
-                        break;
-                    case 'ø':
-                    case 'ð':
-                        asciified.Append('o');
-                        break;
-                    case (char)778:
-                        asciified.Append(asciified[asciified.Length-1]);
-                        break;
-                    case 'ł':
-                        asciified.Append('l');
-                        break;
-                    case 'đ':
-                        asciified.Append('d');
-                        break;
-                    case 'ß':
-                        asciified.Append("ss");
-                        break;
-                    case 'Þ':
-                        asciified.Append("th");
-                        break;
-                    default:
-                        if (CharUnicodeInfo.GetUnicodeCategory(ch) != UnicodeCategory.NonSpacingMark)
-                            if (ch < 128)
-                                asciified.Append(ch);
-                        break;
+                    asciified.Append(ch);
+                    continue;
+                }
+
+                if (CharUnicodeInfo.GetUnicodeCategory(ch) == UnicodeCategory.NonSpacingMark)
+                    continue;
+
+                bool isUpper = Char.IsUpper(ch);
+                char lowerChar = Char.ToLowerInvariant(ch);
+
+                if (UnicodeAsciiMap.TryGetValue(lowerChar, out append) == false)
+                {
+                    if (lowerChar == (char)778)
+                        append = asciified[asciified.Length - 1].ToString();
+                    else
+                        append = String.Empty;
+                }
+
+                if (append != null)
+                {
+                    if (isUpper)
+                        append = append.ToUpperInvariant();
+                    asciified.Append(append);
                 }
             }
             return asciified.ToString();
