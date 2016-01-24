@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.IO;
 
 namespace TurkishDeasciifier
 {
@@ -2488,51 +2487,6 @@ namespace TurkishDeasciifier
         public static bool TryGetPattern(char ch, out Dictionary<string, short> patternData)
         {
             return p.TryGetValue(char.ToLowerInvariant(ch), out patternData);
-        }
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times")]
-        public static void Serialize(string filePath)
-        {
-            using (var stream = File.Open(filePath, FileMode.OpenOrCreate, FileAccess.Write))
-            using (var writer = new BinaryWriter(stream))
-            {
-                writer.Write(p.Count);
-                foreach (var kvp1 in p)
-                {
-                    writer.Write(kvp1.Key);
-                    writer.Write(kvp1.Value.Count);
-                    foreach (var kvp2 in kvp1.Value)
-                    {
-                        writer.Write(kvp2.Key);
-                        writer.Write(kvp2.Value);
-                    }
-                }
-                writer.Flush();
-            }
-        }
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times")]
-        public static void Deserialize(string filePath)
-        {
-            using (var stream = File.Open(filePath, FileMode.Open, FileAccess.Read))
-            using (var reader = new BinaryReader(stream))
-            {
-                int countchar = reader.ReadInt32();
-                p = new Dictionary<char, Dictionary<string, short>>(countchar);
-                for (int i = 0; i < countchar; i++)
-                {
-                    char keychar = reader.ReadChar();
-                    int count = reader.ReadInt32();
-                    var d = new Dictionary<string, short>(count);
-                    for (int j = 0; j < count; j++)
-                    {
-                        var key = reader.ReadString();
-                        var value = reader.ReadInt16();
-                        d.Add(key, value);
-                    }
-                    p.Add(keychar, d);
-                }
-            }
         }
         #endregion
     }
