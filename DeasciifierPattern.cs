@@ -5,7 +5,7 @@ namespace TurkishDeasciifier
     /// <summary>
     /// Pattern Data
     /// </summary>
-    public static class DeasciifierPatterns
+    internal static class DeasciifierPatterns
     {
         private const char LATIN_SMALL_LETTER_C_WITH_CEDILLA = '\u00E7';
         private const char LATIN_CAPITAL_LETTER_C_WITH_CEDILLA = '\u00C7';

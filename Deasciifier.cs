@@ -10,7 +10,6 @@ namespace TurkishDeasciifier
         #region Private Values
         private readonly int _contextSize;
         private readonly bool _aggressive;
-        private char[] _buffer;
         #endregion
 
         #region Constructors
@@ -49,23 +48,24 @@ namespace TurkishDeasciifier
             {
                 return asciiString;
             }
-            _buffer = asciiString.ToCharArray(startIndex, length);
-            for (var i = startIndex; i < length; i++)
+            char[] buffer = asciiString.ToCharArray(startIndex, length);
+            for (int i = startIndex; i < length; i++)
             {
-                char ch = _buffer[i], x;
-                if (NeedCorrection(ch, i) && DeasciifierPatterns.TurkishToggleAccentsTable.TryGetValue(ch, out x))
+                char ch = buffer[i], x;
+                if (NeedCorrection(ref buffer, ch, i) &&
+                    DeasciifierPatterns.TurkishToggleAccentsTable.TryGetValue(ch, out x))
                 {
                     // Adds or removes turkish accent at the cursor.
-                    SetCharAt(_buffer, i, x);
+                    SetCharAt(ref buffer, i, x);
                 }
             }
-            
-            return new string(_buffer);
+
+            return new string(buffer);
         }
         #endregion
 
         #region Private Methods
-        private static void SetCharAt(char[] buf, int index, char ch)
+        private static void SetCharAt(ref char[] buf, int index, char ch)
         {
             buf[index] = ch;
         }
@@ -73,10 +73,11 @@ namespace TurkishDeasciifier
         /// <summary>
         /// Determine if char at cursor needs correction.
         /// </summary>
+        /// <param name="buffer">buffer</param>
         /// <param name="ch">char</param>
         /// <param name="point">index</param>
         /// <returns>whether if needs correction</returns>
-        private bool NeedCorrection(char ch, int point)
+        private bool NeedCorrection(ref char[] buffer, char ch, int point)
         {
             char tr;
             if (!DeasciifierPatterns.TurkishAsciifyTable.TryGetValue(ch, out tr))
@@ -88,7 +89,7 @@ namespace TurkishDeasciifier
             Dictionary<string, short> pattern;
             if (DeasciifierPatterns.TryGetPattern(tr, out pattern))
             {
-                m = MatchPattern(pattern, point);
+                m = MatchPattern(ref buffer, pattern, point);
             }
 
             if (tr == 'I')
@@ -96,9 +97,9 @@ namespace TurkishDeasciifier
             return (ch == tr) ? m : !m;
         }
 
-        private bool MatchPattern(Dictionary<string, short> pattern, int point)
+        private bool MatchPattern(ref char[] buffer, IDictionary<string, short> pattern, int point)
         {
-            char[] s = GetContext(_contextSize, point);
+            char[] s = GetContext(ref buffer, _contextSize, point);
             int rank = pattern.Count * 2;
             int start = 0;
             while (start <= _contextSize)
@@ -119,22 +120,22 @@ namespace TurkishDeasciifier
             return rank > 0;
         }
 
-        private char[] GetContext(int size, int point)
+        private char[] GetContext(ref char[] buffer, int size, int point)
         {
             char[] s = new string(' ', 1 + (2 * size)).ToCharArray();
-            SetCharAt(s, size, 'X');
+            SetCharAt(ref s, size, 'X');
             int i = size + 1;
             int index = point + 1;
             bool space = false;
 
-            while (!space && (i < s.Length) && (index < _buffer.Length))
+            while (!space && (i < s.Length) && (index < buffer.Length))
             {
-                char cc = _buffer[index];
+                char cc = buffer[index];
                 char x;
                 if (DeasciifierPatterns.TurkishDowncaseAsciifyTable.TryGetValue(cc, out x) == false)
                     space = true;
                 else
-                    SetCharAt(s, i, x);
+                    SetCharAt(ref s, i, x);
                 i++;
                 index++;
             }
@@ -147,7 +148,7 @@ namespace TurkishDeasciifier
 
             while (i >= 0 && index >= 0)
             {
-                char cc = _buffer[index];
+                char cc = buffer[index];
                 char x;
                 if (!DeasciifierPatterns.TurkishUpcaseAccentsTable.TryGetValue(cc, out x))
                 {
@@ -159,7 +160,7 @@ namespace TurkishDeasciifier
                 }
                 else
                 {
-                    SetCharAt(s, i, x);
+                    SetCharAt(ref s, i, x);
                     i--;
                     space = false;
                 }
