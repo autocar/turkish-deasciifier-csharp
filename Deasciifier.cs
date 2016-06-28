@@ -5,7 +5,7 @@ namespace TurkishDeasciifier
 {
     public class Deasciifier
     {
-        public const int DefaultContextsize = 20;
+        public const int DefaultContextSize = 20;
 
         #region Private Values
         private readonly int _contextSize;
@@ -13,7 +13,7 @@ namespace TurkishDeasciifier
         #endregion
 
         #region Constructors
-        public Deasciifier() : this(DefaultContextsize, false) { }
+        public Deasciifier() : this(DefaultContextSize, false) { }
 
         public Deasciifier(int contextSize, bool aggressive)
         {
@@ -31,7 +31,6 @@ namespace TurkishDeasciifier
         public string DeAsciify(string asciiString)
         {
             if (asciiString == null) { throw new ArgumentNullException("asciiString"); }
-            asciiString += " ";
             return DeAsciify(asciiString, 0, asciiString.Length);
         }
 
@@ -48,6 +47,7 @@ namespace TurkishDeasciifier
             {
                 return asciiString;
             }
+            asciiString += " ";
             char[] buffer = asciiString.ToCharArray(startIndex, length);
             for (int i = startIndex; i < length; i++)
             {
@@ -60,7 +60,7 @@ namespace TurkishDeasciifier
                 }
             }
 
-            return new string(buffer);
+            return new string(buffer).TrimEnd();
         }
         #endregion
 
@@ -93,8 +93,8 @@ namespace TurkishDeasciifier
             }
 
             if (tr == 'I')
-                return (ch == tr) ? !m : m;
-            return (ch == tr) ? m : !m;
+                return ch == tr ? !m : m;
+            return ch == tr ? m : !m;
         }
 
         private bool MatchPattern(ref char[] buffer, IDictionary<string, short> pattern, int point)
@@ -120,9 +120,9 @@ namespace TurkishDeasciifier
             return rank > 0;
         }
 
-        private char[] GetContext(ref char[] buffer, int size, int point)
+        private static char[] GetContext(ref char[] buffer, int size, int point)
         {
-            char[] s = new string(' ', 1 + (2 * size)).ToCharArray();
+            char[] s = new string(' ', 1 + 2 * size).ToCharArray();
             SetCharAt(ref s, size, 'X');
             int i = size + 1;
             int index = point + 1;

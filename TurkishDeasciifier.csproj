@@ -36,6 +36,7 @@
   <ItemGroup>
     <Compile Include="Deasciifier.cs" />
     <Compile Include="DeasciifierPattern.cs" />
+    <Compile Include="DeasciifierTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />
