@@ -34,6 +34,7 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IDeasciifierPatterns.cs" />
     <Compile Include="Deasciifier.cs" />
     <Compile Include="DeasciifierPattern.cs" />
     <Compile Include="DeasciifierTest.cs" />

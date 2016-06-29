@@ -1,36 +1,37 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 
 namespace TurkishDeasciifier
 {
     /// <summary>
     /// Pattern Data
     /// </summary>
-    internal static class DeasciifierPatterns
+    internal class DeasciifierPatterns : IDeasciifierPatterns
     {
-        private const char LATIN_SMALL_LETTER_C_WITH_CEDILLA = '\u00E7';
-        private const char LATIN_CAPITAL_LETTER_C_WITH_CEDILLA = '\u00C7';
+        private const char LatinSmallLetterCWithCedilla = '\u00E7';
+        private const char LatinCapitalLetterCWithCedilla = '\u00C7';
 
-        private const char LATIN_SMALL_LETTER_G_WITH_BREVE = '\u011F';
-        private const char LATIN_CAPITAL_LETTER_G_WITH_BREVE = '\u011E';
+        private const char LatinSmallLetterGWithBreve = '\u011F';
+        private const char LatinCapitalLetterGWithBreve = '\u011E';
 
-        private const char LATIN_SMALL_LETTER_DOTLESS_I = '\u0131';
-        private const char LATIN_CAPITAL_LETTER_I_WITH_DOT_ABOVE = '\u0130';
+        private const char LatinSmallLetterDotlessI = '\u0131';
+        private const char LatinCapitalLetterIWithDotAbove = '\u0130';
 
-        private const char LATIN_SMALL_LETTER_O_WITH_DIAERESIS = '\u00F6';
-        private const char LATIN_CAPITAL_LETTER_O_WITH_DIAERESIS = '\u00D6';
+        private const char LatinSmallLetterOWithDiaeresis = '\u00F6';
+        private const char LatinCapitalLetterOWithDiaeresis = '\u00D6';
 
-        private const char LATIN_SMALL_LETTER_S_WITH_CEDILLA = '\u015F';
-        private const char LATIN_CAPITAL_LETTER_S_WITH_CEDILLA = '\u015E';
+        private const char LatinSmallLetterSWithCedilla = '\u015F';
+        private const char LatinCapitalLetterSWithCedilla = '\u015E';
 
-        private const char LATIN_SMALL_LETTER_U_WITH_DIAERESIS = '\u00FC';
-        private const char LATIN_CAPITAL_LETTER_U_WITH_DIAERESIS = '\u00DC';
+        private const char LatinSmallLetterUWithDiaeresis = '\u00FC';
+        private const char LatinCapitalLetterUWithDiaeresis = '\u00DC';
 
         /// <summary>
         /// Converts turkish characters into ascii equivalent.
         /// </summary>
-        private static readonly Dictionary<char, char> turkishAsciifyTable;
+        private readonly Dictionary<char, char> _turkishAsciifyTable;
 
-        private static readonly Dictionary<char, char> turkishDowncaseAsciifyTable;
+        private readonly Dictionary<char, char> _turkishDowncaseAsciifyTable;
 
         /// <summary>
         /// Lowercase the string except for Turkish accented characters which
@@ -38,7 +39,7 @@ namespace TurkishDeasciifier
         /// matching.  Handles all 3 encodings.  The confusing case of i is as
         /// follows: i => i, dotted I => i, dotless i => I, I => I
         /// </summary>
-        private static readonly Dictionary<char, char> turkishUpcaseAccentsTable;
+        private readonly Dictionary<char, char> _turkishUpcaseAccentsTable;
 
         /// <summary>
         /// Converts turkish characters into ascii equivalent and appropriate
@@ -46,7 +47,7 @@ namespace TurkishDeasciifier
         /// work if the file is latin-5, emacs will automatically convert utf-8
         /// characters to latin-5 when saving.
         /// </summary>
-        private static readonly Dictionary<char, char> turkishToggleAccentsTable;
+        private readonly Dictionary<char, char> _turkishToggleAccentsTable;
 
         /// <summary>
         /// Compiles a decision list into a hash where keys are patterns and
@@ -55,13 +56,13 @@ namespace TurkishDeasciifier
         /// implies nil), and the absolute value gives the rank (smaller rank
         /// means higher priority).
         /// </summary>
-        private static Dictionary<char, Dictionary<string, short>> p;
+        private readonly Dictionary<char, Dictionary<string, short>> _p;
 
         #region Constructors
-        static DeasciifierPatterns()
+        public DeasciifierPatterns()
         {
             char[] keys = { 'c', 'g', 'i', 'o', 's', 'u' };
-            p = new Dictionary<char, Dictionary<string, short>>(keys.Length);
+            _p = new Dictionary<char, Dictionary<string, short>>(keys.Length);
 
             //These are the decision lists.  There is one decision list for each
             //of the letters 'c', 'g', 'i', 'o', 's', 'u'.  The format is pretty
@@ -81,7 +82,7 @@ namespace TurkishDeasciifier
                 {
                     #region case c
                     case 'c':
-                        p.Add(key, new Dictionary<string, short>()
+                        _p.Add(key, new Dictionary<string, short>
                         {
                             {"bu aXa",-1},{"Cki Xi",-2},{"na Xog",3},{"ram Xo",4},{"gol aX",5},{"huyu X",-6},
                             {"m Xars",7},{"Ik Xip",-8},{"ncu X ",9},{"zay Xo",10},{"Xincik",11},{"vre aX",12},
@@ -513,7 +514,7 @@ namespace TurkishDeasciifier
 
                     #region case g
                     case 'g':
-                        p.Add(key, new Dictionary<string, short>()
+                        _p.Add(key, new Dictionary<string, short>
                         {
                             {" s iX",1},{" oraX",-2},{"loXi ",3},{"itelX",4},{"zilXi",5},{"r oXr",-6},
                             {"aroXu",-7},{"teXes",-8},{"Ig aX",-9},{"zdIX ",-10},{"i teX",11},{"p leX",12},
@@ -647,7 +648,7 @@ namespace TurkishDeasciifier
 
                     #region case i
                     case 'i':
-                        p.Add(key, new Dictionary<string, short>()
+                        _p.Add(key, new Dictionary<string, short>
                         {
                             {"n kXsan",-1},{" nin Xn",-2},{"tIyor X",-3},{" armanX",-4},{"Xstirab",5},{"aktXgim",6},
                             {"eci Xsi",7},{"er de X",-8},{"ere Xsi",9},{"ne takX",10},{"ratan X",-11},{"Uyen Xn",12},
@@ -1148,7 +1149,7 @@ namespace TurkishDeasciifier
 
                     #region case o
                     case 'o':
-                        p.Add(key, new Dictionary<string, short>()
+                        _p.Add(key, new Dictionary<string, short>
                         {
                             {"uz kXr",-1},{"ni kXt",2},{"dir gX",3},{"Il dXn",4},{"an Xng",5},{"lum kX",-6},
                             {"niS kX",-7},{"Giz gX",8},{" te gX",9},{"rka kX",-10},{"jIn Xn",11},{"ki rXp",12},
@@ -1428,7 +1429,7 @@ namespace TurkishDeasciifier
 
                     #region case s
                     case 's':
-                        p.Add(key, new Dictionary<string, short>()
+                        _p.Add(key, new Dictionary<string, short>
                         {
                             {"kut Xe",1},{"a nurX",2},{"lIXiyi",-3},{"Xleriz",-4},{"raXama",5},{"de aX ",-6},
                             {"vard X",7},{"irmeX ",8},{"gin Xo",-9},{"k miX ",10},{"re fiX",11},{"IXici ",-12},
@@ -1969,7 +1970,7 @@ namespace TurkishDeasciifier
 
                     #region case u
                     case 'u':
-                        p.Add(key, new Dictionary<string, short>()
+                        _p.Add(key, new Dictionary<string, short>
                         {
                             {"Xctugu",-1},{" ay sX",2},{"fXtur ",3},{"Xysuz ",-4},{"Gi rXs",-5},{"an Xnv",6},
                             {"Xldeni",-7},{"dIn Xn",8},{"i kXcu",9},{"43 sX ",10},{"Xcunda",-11},{"g kulX",12},
@@ -2377,116 +2378,127 @@ namespace TurkishDeasciifier
             }
             #endregion
 
-            turkishAsciifyTable = new Dictionary<char, char>(12)
+            _turkishAsciifyTable = new Dictionary<char, char>(12)
             {
-                {LATIN_SMALL_LETTER_C_WITH_CEDILLA,     'c'},
-                {LATIN_CAPITAL_LETTER_C_WITH_CEDILLA,   'C'},
-                {LATIN_SMALL_LETTER_G_WITH_BREVE,       'g'},
-                {LATIN_CAPITAL_LETTER_G_WITH_BREVE,     'G'},
-                {LATIN_SMALL_LETTER_DOTLESS_I,          'i'},
-                {LATIN_CAPITAL_LETTER_I_WITH_DOT_ABOVE, 'I'},
-                {LATIN_SMALL_LETTER_O_WITH_DIAERESIS,   'o'},
-                {LATIN_CAPITAL_LETTER_O_WITH_DIAERESIS, 'O'},
-                {LATIN_SMALL_LETTER_S_WITH_CEDILLA,     's'},
-                {LATIN_CAPITAL_LETTER_S_WITH_CEDILLA,   'S'},
-                {LATIN_SMALL_LETTER_U_WITH_DIAERESIS,   'u'},
-                {LATIN_CAPITAL_LETTER_U_WITH_DIAERESIS, 'U'}
+                {LatinSmallLetterCWithCedilla,     'c'},
+                {LatinCapitalLetterCWithCedilla,   'C'},
+                {LatinSmallLetterGWithBreve,       'g'},
+                {LatinCapitalLetterGWithBreve,     'G'},
+                {LatinSmallLetterDotlessI,          'i'},
+                {LatinCapitalLetterIWithDotAbove, 'I'},
+                {LatinSmallLetterOWithDiaeresis,   'o'},
+                {LatinCapitalLetterOWithDiaeresis, 'O'},
+                {LatinSmallLetterSWithCedilla,     's'},
+                {LatinCapitalLetterSWithCedilla,   'S'},
+                {LatinSmallLetterUWithDiaeresis,   'u'},
+                {LatinCapitalLetterUWithDiaeresis, 'U'}
             };
 
-            turkishDowncaseAsciifyTable = new Dictionary<char, char>(64);
-            turkishUpcaseAccentsTable = new Dictionary<char, char>(64);
-            turkishToggleAccentsTable = new Dictionary<char, char>(24);
+            _turkishDowncaseAsciifyTable = new Dictionary<char, char>(64);
+            _turkishUpcaseAccentsTable = new Dictionary<char, char>(64);
+            _turkishToggleAccentsTable = new Dictionary<char, char>(24);
 
             for (char ch = 'a'; ch <= 'z'; ch++)
             {
-                turkishDowncaseAsciifyTable.Add(ch, ch);
-                turkishDowncaseAsciifyTable.Add(char.ToUpperInvariant(ch), ch);
+                _turkishDowncaseAsciifyTable.Add(ch, ch);
+                _turkishDowncaseAsciifyTable.Add(char.ToUpperInvariant(ch), ch);
             }
 
             for (char ch = 'A'; ch <= 'Z'; ch++)
             {
                 char lowerCh = char.ToLowerInvariant(ch);
-                turkishUpcaseAccentsTable.Add(ch, lowerCh);
-                turkishUpcaseAccentsTable.Add(lowerCh, lowerCh);
+                _turkishUpcaseAccentsTable.Add(ch, lowerCh);
+                _turkishUpcaseAccentsTable.Add(lowerCh, lowerCh);
             }
 
-            foreach (KeyValuePair<char, char> kvp in turkishAsciifyTable)
+            foreach (KeyValuePair<char, char> kvp in _turkishAsciifyTable)
             {
-                turkishDowncaseAsciifyTable[kvp.Key] = char.ToLowerInvariant(kvp.Value);
-                turkishUpcaseAccentsTable[kvp.Key] = char.ToUpperInvariant(kvp.Value);
+                _turkishDowncaseAsciifyTable[kvp.Key] = char.ToLowerInvariant(kvp.Value);
+                _turkishUpcaseAccentsTable[kvp.Key] = char.ToUpperInvariant(kvp.Value);
 
-                turkishToggleAccentsTable.Add(kvp.Key, kvp.Value);
-                turkishToggleAccentsTable.Add(kvp.Value, kvp.Key);
+                _turkishToggleAccentsTable.Add(kvp.Key, kvp.Value);
+                _turkishToggleAccentsTable.Add(kvp.Value, kvp.Key);
             }
 
-            turkishUpcaseAccentsTable['i'] = 'i';
-            turkishUpcaseAccentsTable['I'] = 'I';
-            turkishUpcaseAccentsTable[LATIN_CAPITAL_LETTER_I_WITH_DOT_ABOVE] = 'i';
-            turkishUpcaseAccentsTable[LATIN_SMALL_LETTER_DOTLESS_I] = 'I';
+            _turkishUpcaseAccentsTable['i'] = 'i';
+            _turkishUpcaseAccentsTable['I'] = 'I';
+            _turkishUpcaseAccentsTable[LatinCapitalLetterIWithDotAbove] = 'i';
+            _turkishUpcaseAccentsTable[LatinSmallLetterDotlessI] = 'I';
         }
         #endregion
 
         #region Public Properties
-        public static Dictionary<char, Dictionary<string, short>> BigPattern
+        public Dictionary<char, Dictionary<string, short>> BigPattern
         {
-            get { return p; }
+            get { return _p; }
         }
 
-        public static Dictionary<char, char> TurkishAsciifyTable
+        public Dictionary<char, char> TurkishAsciifyTable
         {
-            get { return turkishAsciifyTable; }
+            get { return _turkishAsciifyTable; }
         }
 
-        public static Dictionary<char, char> TurkishDowncaseAsciifyTable
+        public Dictionary<char, char> TurkishDowncaseAsciifyTable
         {
-            get { return turkishDowncaseAsciifyTable; }
+            get { return _turkishDowncaseAsciifyTable; }
         }
 
-        public static Dictionary<char, char> TurkishUpcaseAccentsTable
+        public Dictionary<char, char> TurkishUpcaseAccentsTable
         {
-            get { return turkishUpcaseAccentsTable; }
+            get { return _turkishUpcaseAccentsTable; }
         }
 
-        public static Dictionary<char, char> TurkishToggleAccentsTable
+        public Dictionary<char, char> TurkishToggleAccentsTable
         {
-            get { return turkishToggleAccentsTable; }
+            get { return _turkishToggleAccentsTable; }
         }
 
-        public static Dictionary<string, short> C
+        public Dictionary<string, short> C
         {
-            get { return p['c']; }
+            get { return _p['c']; }
         }
 
-        public static Dictionary<string, short> G
+        public Dictionary<string, short> G
         {
-            get { return p['g']; }
+            get { return _p['g']; }
         }
 
-        public static Dictionary<string, short> I
+        public Dictionary<string, short> I
         {
-            get { return p['i']; }
+            get { return _p['i']; }
         }
 
-        public static Dictionary<string, short> O
+        public Dictionary<string, short> O
         {
-            get { return p['o']; }
+            get { return _p['o']; }
         }
 
-        public static Dictionary<string, short> S
+        public Dictionary<string, short> S
         {
-            get { return p['s']; }
+            get { return _p['s']; }
         }
 
-        public static Dictionary<string, short> U
+        public Dictionary<string, short> U
         {
-            get { return p['u']; }
+            get { return _p['u']; }
         }
         #endregion
 
         #region Public Methods
-        public static bool TryGetPattern(char ch, out Dictionary<string, short> patternData)
+        public bool TryGetPattern(char ch, out Dictionary<string, short> patternData)
         {
-            return p.TryGetValue(char.ToLowerInvariant(ch), out patternData);
+            return _p.TryGetValue(char.ToLowerInvariant(ch), out patternData);
+        }
+        public bool TryGetPattern(char ch, out IDictionary patternData)
+        {
+            Dictionary<string, short> d;
+            if (TryGetPattern(ch, out d))
+            {
+                patternData = d;
+                return true;
+            }
+            patternData = null;
+            return false;
         }
         #endregion
     }

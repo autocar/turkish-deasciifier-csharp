@@ -32,7 +32,7 @@ namespace TurkishDeasciifier
             {
                 string resultString = deasciifier.DeAsciify(asciiStrings[i]);
                 Console.WriteLine("Test Number {0} WAS {1}", i + 1,
-                    string.Equals(resultString, turkishStrings[i]) ? "SUCCESSFUL" : "FAILED");
+                    string.Equals(resultString, turkishStrings[i], StringComparison.Ordinal) ? "SUCCESSFUL" : "FAILED");
             }
         }
     }
